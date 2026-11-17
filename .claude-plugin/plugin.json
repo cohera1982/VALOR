@@ -1,0 +1,8 @@
+{
+  "name": "valor",
+  "version": "1.4.3",
+  "description": "VALOR value orchestration: the Value Coach and the Orchestrator, with the KPI register, verified benchmarks and indicative value ranges.",
+  "author": {
+    "name": "Rajaraman Kannan, Cohera Labs Pty Ltd"
+  }
+}

@@ -1,0 +1,183 @@
+# WORKED EXAMPLE: an epic value tree (record_level: epic) with its features, VALOR v24 / EVAGO §15.
+# Inputs marked "EXAMPLE — not client data" are invented to show how indicative value is computed.
+# In real use every baseline and unit value comes from a named client source or stays REQUIRES VALIDATION.
+# Render the driver tree with:  python3 scripts/driver_tree.py examples/taxi-fleet-availability-epic.yaml
+fvr_version: 1.2
+record_level: epic
+record:
+  epic_key: TAXI-EXAMPLE-EPIC
+  epic_name: Taxi fleet availability
+  example: true               # shows the "worked example" banner on the driver tree
+  strategic_theme: Operational excellence
+  initiative: Fleet reliability and utilisation
+  business_unit: "Mobility – Taxi Operator A"
+  domain_pack: mobility-taxi
+  record_status: draft
+  evidence_tier: T1
+  lifecycle_stage: shape
+  agreements: []
+  revision_log:
+    - {date: "2026-10-26", by: "VALOR worked example", change: "Epic value tree with three features"}
+
+evago:
+  value_owner: {name: "REQUIRES VALIDATION", role: "GM, Mobility – Taxi Operator A"}
+  kpi_owners:
+    - {kpi_id: TXI-BG-01, role: "Fleet Operations Manager"}
+    - {kpi_id: TXI-BG-04, role: "Fleet Maintenance Manager"}
+    - {kpi_id: TXI-BG-05, role: "Fleet Maintenance Manager"}
+    - {kpi_id: NEW-03, role: "Fleet Maintenance Manager"}
+  itbp: {name: "REQUIRES VALIDATION"}
+  business_outcomes:
+    - {outcome: "More vehicle shifts on the road", lagging_kpis: [TXI-BG-01]}
+    - {outcome: "Fewer, cheaper unplanned repairs", lagging_kpis: [TXI-BG-04, TXI-BG-05]}
+  expected_financial_outcome: {range: "none claimed", approval_tier: none-claimed}
+  execution_entry: {joint_definition_confirmed: false, financial_outcome_approved: false, cleared_for_execution: false}
+  targets: {status: suggested}
+
+formation:
+  value_intent: Keep more taxis earning across both shifts, at lower maintenance cost per km
+  primary_pillar: P02
+  secondary_pillars: [P04, P05]
+  hypothesis:
+    text: >
+      We believe predictive maintenance scheduling (F1), dynamic partner allocation (F2) and parts
+      pre-staging (F3) will raise vehicle shift fill rate by 5–10 points and cut unplanned repair
+      visits by 20–40% within four quarters (suggested), because planners act on failure alerts in
+      off-peak windows and idle drivers accept partner offers. If that holds, maintenance cost per km falls.
+    falsifier: >
+      Unplanned repair visits don't fall once 80% of alerts are actioned in the window; shift fill rate
+      doesn't move once offer acceptance passes 60%; no-fault-found visits rise above 15% of interventions.
+  assumptions:
+    - {id: A1, statement: "Alerts give enough lead time to plan repairs off-peak", status: untested}
+    - {id: A2, statement: "Workshop capacity can absorb planned jobs", status: untested}
+    - {id: A3, statement: "Extra filled shifts meet unmet demand (otherwise no margin)", status: untested}
+
+measurement:
+  kpis:
+    - kpi_id: TXI-BG-01
+      name: Vehicle shift fill rate
+      type: Business Lagging
+      driver: P02-D06
+      contract: {unit: "%", baseline_value: "REQUIRES VALIDATION — Fleet Operations, trailing 12 months", outcome_owner: "Fleet Operations Manager",
+                 benchmark_ids: [BM-TXI-BG-01-3], recommended_range: "+5 to +10 pts within 2 quarters", range_basis: suggested}
+    - kpi_id: TXI-BG-04
+      name: Unplanned repair visits per 100k km
+      type: Business Lagging
+      driver: P02-D06
+      contract: {unit: "per 100k km", baseline_value: "REQUIRES VALIDATION — Fleet Maintenance, trailing 12 months", outcome_owner: "Fleet Maintenance Manager",
+                 benchmark_ids: [BM-TXI-BG-04-1], recommended_range: "20–40% below baseline within 4 quarters", range_basis: suggested,
+                 scope_vs_benchmark: partial}
+    - kpi_id: TXI-BG-05
+      name: Maintenance cost per km
+      type: Business Lagging
+      driver: P02-D05
+      contract: {unit: "AED/km", baseline_value: "REQUIRES VALIDATION — Fleet Finance", outcome_owner: "Fleet Maintenance Manager",
+                 benchmark_ids: [BM-TXI-BG-05-1, BM-TXI-BG-05-2], recommended_range: "25–27.5% below baseline within 4 quarters (partial scope)", range_basis: benchmarked,
+                 scope_vs_benchmark: partial}
+    - kpi_id: NEW-03
+      name: No-fault-found interventions
+      type: Business Lagging
+      guardrail: true
+      driver: P02-D06
+      contract: {unit: "% of interventions", baseline_value: "new process", outcome_owner: "Fleet Maintenance Manager",
+                 recommended_range: "keep below 15%", range_basis: suggested}
+
+features:
+  - key: TAXI-F1
+    name: Predictive maintenance scheduling
+    primary_driver: P02-D06
+    secondary_drivers:
+      - {driver: P05-D07, role: "AI failure prediction is the enabler"}
+    required_operational_change: Maintenance planners book flagged vehicles into off-peak workshop slots within 72 hours
+    change_owner: Fleet Maintenance Manager
+    kpis:
+      - {kpi_id: NEW-01, name: "Alerts actioned within 72 hours", type: Business Leading, contract: {unit: "%", baseline_value: "new process", recommended_range: "80–95% within 2 quarters", range_basis: suggested}}
+      - {kpi_id: TXI-TL-02, name: "Predictive maintenance alert precision", type: Technical Leading, contract: {unit: "%", recommended_range: "80–90% before scaling", range_basis: suggested}}
+    contributes_to:
+      - {epic_kpi: TXI-BG-04, share: "most of the movement (to confirm — Value Owner)"}
+      - {epic_kpi: TXI-BG-05, share: "with F3 (to confirm — Value Owner)"}
+  - key: TAXI-F2
+    name: Dynamic partner allocation
+    primary_driver: P02-D06
+    secondary_drivers:
+      - {driver: P04-D04, role: "Driver earnings and engagement, tracked only"}
+    required_operational_change: Idle drivers receive and accept partner offers; allocation team stops manual pairing
+    change_owner: Driver Allocation Manager
+    kpis:
+      - {kpi_id: TXI-BL-01, name: "Offer acceptance rate", type: Business Leading, contract: {unit: "%", baseline_value: "new process", recommended_range: "60–80% within 3–6 months", range_basis: suggested}}
+    contributes_to:
+      - {epic_kpi: TXI-BG-01, share: "most of the movement (to confirm — Value Owner)"}
+  - key: TAXI-F3
+    name: Parts pre-staging for predicted jobs
+    primary_driver: P02-D05
+    secondary_drivers: []
+    required_operational_change: Parts controllers pre-stage parts for jobs F1 schedules, two days ahead
+    change_owner: Workshop Parts Controller
+    kpis:
+      - {kpi_id: NEW-02, name: "Predicted jobs with parts pre-staged", type: Business Leading, contract: {unit: "%", baseline_value: "new process", recommended_range: "85–95% within 2 quarters", range_basis: suggested}}
+    contributes_to:
+      - {epic_kpi: TXI-BG-05, share: "with F1 (to confirm — Value Owner)"}
+
+economics:
+  benefits:
+    - id: B1
+      feature: TAXI-F1
+      category: CA
+      description: Avoided cost when failures are repaired as planned, not unplanned
+      driver: P02-D06
+      linked_kpi: TXI-BG-04
+      inputs:
+        baseline: {value: 2400, unit: "unplanned visits a year", source: "EXAMPLE — not client data"}
+        improvement: {value: [0.20, 0.40], source: "suggested (KPI register)"}
+        unit_value: {value: 1100, unit: "AED per visit (unplanned minus planned)", source: "EXAMPLE — not client data"}
+      indicative_range: [528000, 1056000]
+      counting: Counted
+    - id: B2
+      feature: TAXI-F3
+      category: CS
+      description: Lower parts expediting spend
+      driver: P02-D05
+      linked_kpi: TXI-BG-05
+      inputs:
+        baseline: {value: 600000, unit: "AED expediting spend a year", source: "EXAMPLE — not client data"}
+        improvement: {value: [0.10, 0.20], source: "suggested"}
+      indicative_range: [60000, 120000]
+      counting: Counted
+    - id: B3
+      feature: TAXI-F2
+      category: MG
+      description: Contribution margin from extra filled shifts, only if demand exists (A3)
+      driver: P02-D06
+      linked_kpi: TXI-BG-01
+      inputs: {}
+      indicative_range: null
+      counting: "To confirm"
+    - id: B4
+      feature: TAXI-F2
+      category: CR
+      description: Allocation team time freed from manual pairing
+      driver: P02-D06
+      linked_kpi: TXI-BG-01
+      inputs:
+        baseline: {value: 3000, unit: "hours a year", source: "EXAMPLE — not client data"}
+        improvement: {value: [0.30, 0.50], source: "suggested"}
+        unit_value: {value: 85, unit: "AED per hour", source: "EXAMPLE — not client data"}
+      indicative_range: [76500, 127500]
+      conversion_mechanism: ""
+      counting: "Not counted (no conversion mechanism with an owner)"
+  costs: []
+  results:
+    counted_annual_value: [588000, 1176000]
+    label: "Indicative, suggested ranges; to validate — Finance. Not Board-reportable below T2."
+
+challenge:
+  findings:
+    - {id: F1, check: C03, severity: major, finding: "B4 time freed has no conversion mechanism", fix: "Name no-backfill or redeployment owner, or leave uncounted", resolved: false}
+    - {id: F2, check: C07, severity: major, finding: "B3 assumes unmet demand for extra shifts", fix: "Commercial to evidence unserved bookings at peak", resolved: false}
+  overlap_with: []
+  defensibility: moderate
+  scores:   # written by scripts/score.py
+    strands: {strategic: 100, conversion: 90, counting: 88, data: 88}
+    coherence: {headline: 92, capped_by_conversion_gate: false, weakest_strand: counting, weakest_link: value_measure_business_owner}
+    confidence: {score: 15, label: Low, next_best_step: {component: baselines, step: "Supply measured baselines for the KPIs", points_available: 20.0}}
+    verdict: {rubric: null, display: "Shaping — no verdict before Commit"}
